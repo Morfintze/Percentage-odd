@@ -1,3 +1,5 @@
+import streamlit as st
+
 def percentage_to_odd(percentage):
     try:
         return 100 / percentage
@@ -10,40 +12,30 @@ def odd_to_percentage(odd):
     except ZeroDivisionError:
         return None
 
-def main():
-    while True:
-        keuze = input("Heb je een percentage of een odd? (P voor percentage, O voor odd, Q om te stoppen): ").strip().upper()
+st.title("Percentage ↔ Odd converter")
 
-        if keuze == 'Q':
-            print("Programma gestopt.")
-            break
+# Kies conversie
+keuze = st.radio("Welke waarde wil je invoeren?", ("Percentage", "Odd"))
 
-        if keuze not in ['P', 'O']:
-            print("Ongeldige keuze. Typ 'P' voor percentage, 'O' voor odd, of 'Q' om te stoppen.")
-            continue
+# Voer waarde in
+waarde_input = st.text_input(f"Voer een {keuze} in:")
 
-        waarde_input = input("Voer de waarde in: ").strip().replace(",", ".")
-
-        try:
-            waarde = float(waarde_input)
-        except ValueError:
-            print("Ongeldige invoer. Voer een numerieke waarde in.")
-            continue
-
-        if keuze == 'P':
-            odd = percentage_to_odd(waarde)
-            if odd is not None:
-                print(f"De odd is: {odd:.4f}")
+if waarde_input:
+    # Vervang komma door punt
+    waarde_input = waarde_input.replace(",", ".")
+    try:
+        waarde = float(waarde_input)
+        if keuze == "Percentage":
+            result = percentage_to_odd(waarde)
+            if result is None:
+                st.error("Kan niet delen door nul.")
             else:
-                print("Kan niet delen door nul.")
+                st.success(f"Odd is: {result:.4f}")
         else:
-            percentage = odd_to_percentage(waarde)
-            if percentage is not None:
-                print(f"Het percentage is: {percentage:.2f}%")
+            result = odd_to_percentage(waarde)
+            if result is None:
+                st.error("Kan niet delen door nul.")
             else:
-                print("Kan niet delen door nul.")
-
-        print("-" * 40)
-
-if __name__ == "__main__":
-    main()
+                st.success(f"Percentage is: {result:.2f}%")
+    except ValueError:
+        st.error("Ongeldige invoer. Voer een numerieke waarde in.")
